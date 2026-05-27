@@ -1,0 +1,45 @@
+name: Build Survey Pro BD APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: কোড ডাউনলোড করো
+        uses: actions/checkout@v4
+
+      - name: Java সেটআপ করো
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Flutter সেটআপ করো
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.6'
+          channel: 'stable'
+
+      - name: Flutter ভার্সন চেক
+        run: flutter --version
+
+      - name: প্যাকেজ ডাউনলোড করো
+        run: flutter pub get
+
+      - name: Isar কোড জেনারেট করো
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: APK বানাও
+        run: flutter build apk --release
+
+      - name: APK আপলোড করো
+        uses: actions/upload-artifact@v4
+        with:
+          name: SurveyProBD-Release-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
